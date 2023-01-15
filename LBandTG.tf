@@ -18,7 +18,7 @@ resource "aws_lb" "yh-tf-alb" {
 // add a Listener
 resource "aws_lb_listener" "listener" {
   load_balancer_arn = aws_lb.yh-tf-alb.arn
-  port = "80"
+  port = var.alb_port
   protocol = "HTTP"
 
   default_action {
@@ -30,7 +30,7 @@ resource "aws_lb_listener" "listener" {
 // create a target group for the ALB
 resource "aws_lb_target_group" "yh-tf-tg" {
   name     = "yh-tf-tg"
-  port     = 80
+  port     = var.instance_port
   protocol = "HTTP"
   vpc_id   = aws_vpc.yh-tf.id
 
@@ -54,8 +54,8 @@ resource "aws_security_group" "yh-tf-sg-alb" {
   vpc_id      = aws_vpc.yh-tf.id
 
   ingress {
-    from_port        = 80
-    to_port          = 80
+    from_port        = var.alb_port
+    to_port          = var.alb_port
     protocol         = "tcp"
     cidr_blocks      = ["0.0.0.0/0"]
   }

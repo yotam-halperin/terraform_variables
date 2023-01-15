@@ -1,13 +1,15 @@
 // first instance
 resource "aws_instance" "yh-tf1" {
-  ami = "ami-01b8d743224353ffe"
-  instance_type = "t3a.small"
+  ami = var.instance_ami
+  instance_type = var.instance_type
 
   vpc_security_group_ids = [aws_security_group.yh-tf-sg-i.id]
   subnet_id = aws_subnet.yh-s1.id
 
   associate_public_ip_address = true
   
+  user_data = var.userdata
+
   tags = {
         Name = "yh-tf1"
         owner = "yotam_halperin"
@@ -18,13 +20,15 @@ resource "aws_instance" "yh-tf1" {
 
 // second instance
 resource "aws_instance" "yh-tf2" {
-  ami = "ami-01b8d743224353ffe"
-  instance_type = "t3a.small"
+  ami = var.instance_ami
+  instance_type = var.instance_type
 
   vpc_security_group_ids = [aws_security_group.yh-tf-sg-i.id]
   subnet_id = aws_subnet.yh-s2.id
 
   associate_public_ip_address = true
+
+  user_data = var.userdata
   
   tags = {
         Name = "yh-tf2"
@@ -48,8 +52,8 @@ resource "aws_security_group" "yh-tf-sg-i" {
   }
 
   ingress {
-    from_port        = 80
-    to_port          = 80
+    from_port        = var.instance_port
+    to_port          = var.instance_port
     protocol         = "tcp"
     security_groups  = [aws_security_group.yh-tf-sg-alb.id]
   }
@@ -67,10 +71,10 @@ resource "aws_security_group" "yh-tf-sg-i" {
 resource "aws_lb_target_group_attachment" "first_attachment" {
   target_group_arn = aws_lb_target_group.yh-tf-tg.arn
   target_id        = aws_instance.yh-tf1.id
-  port             = 80
+  port             = var.instance_port
 }
 resource "aws_lb_target_group_attachment" "second_attachment" {
   target_group_arn = aws_lb_target_group.yh-tf-tg.arn
   target_id        = aws_instance.yh-tf2.id
-  port             = 80
+  port             = var.instance_port
 }

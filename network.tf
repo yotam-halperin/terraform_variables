@@ -1,11 +1,20 @@
+terraform {
+  backend "s3" {
+    bucket = "yotam-halperin"
+    key    = "tf-conf/terraform.tfstate"
+    region = "eu-west-2"
+  }
+}
+
+
 // the provider
 provider "aws" {
-    region = "eu-west-2"
+    region = var.region
 }
 
 // VPC 
 resource "aws_vpc" "yh-tf" {
-    cidr_block = "10.10.0.0/16"
+    cidr_block = var.vpc_cidr
 
     tags = {
         Name = "yh-tf"
@@ -18,8 +27,8 @@ resource "aws_vpc" "yh-tf" {
 // first subnet
 resource "aws_subnet" "yh-s1" {
     vpc_id = aws_vpc.yh-tf.id
-    cidr_block = "10.10.10.0/24"
-    availability_zone = "eu-west-2a"
+    cidr_block = var.first_subnet_cidr
+    availability_zone = "${var.region}a"
 
     tags = {
         Name = "yh-s1"
@@ -32,8 +41,8 @@ resource "aws_subnet" "yh-s1" {
 // second subnet
 resource "aws_subnet" "yh-s2" {
     vpc_id = aws_vpc.yh-tf.id
-    cidr_block = "10.10.20.0/24"
-    availability_zone = "eu-west-2b"
+    cidr_block = var.second_subnet_cidr
+    availability_zone = "${var.region}b"
 
     tags = {
         Name = "yh-s2"
